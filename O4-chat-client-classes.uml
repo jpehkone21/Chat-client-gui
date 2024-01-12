@@ -1,0 +1,65 @@
+@startuml
+package oy.tol.chatclient {
+  interface ChatClientDataProvider
+  class ChatClient
+  class ChatTCPClient
+  package chat {
+    abstract class Message {
+      - type: int
+      + getType(): int
+      + {abstract} toJSON(): String
+    }
+    class ChatMessage {
+      -id: UUID
+      -inReplyTo: UUID
+      -sent: LocalDateTime 
+      -nick: String
+      -directMessageTo: String
+      -message: String 
+    }
+    class ChangeTopicMessage {
+      -topic: String
+    }
+    class ListChannelsMessage {
+      -channels: List<String>
+    }
+    class StatusMessage {
+      -status: String
+    }
+    class ErrorMessage {
+      -error: String
+      -requiresShutdown: int 
+    }
+    class JoinMessage {
+      -channel: String
+    }
+    ChatMessage --|> Message 
+    ChangeTopicMessage --|> Message 
+    ListChannelsMessage --|> Message 
+    StatusMessage --|> Message 
+    ErrorMessage --|> Message 
+    JoinMessage --|> Message
+    class MessageFactory {
+      +fromJSON(jsonObject: JSONObject): Message
+    }
+    MessageFactory ..> Message: creates
+  }
+}
+package java.net {
+  class Socket
+}
+package org.json {
+  class JSONObject
+}
+ChatClient : main()
+ChatClientDataProvider <|.. ChatClient
+ChatClient *-- ChatTCPClient
+ChatTCPClient ..> ChatClientDataProvider
+ChatTCPClient --> Socket
+ChatTCPClient --> JSONObject
+ChatTCPClient ..> Message: sends and receives
+ChatClient ..> Message
+note "Communicates with ChatServer" as N1
+N1 .. ChatTCPClient
+@enduml
+
