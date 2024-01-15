@@ -3,11 +3,13 @@ package oy.tol.chatclient;
 
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,6 +36,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -68,6 +71,7 @@ import oy.tol.chat.StatusMessage;
 public class ChatClient extends JFrame implements ActionListener, ListSelectionListener, ChatClientDataProvider  {
 
     public static void main(String[] args) {
+		System.out.println(args.length);
  
     	if (args.length == 1) {								
         	try {
@@ -79,9 +83,6 @@ public class ChatClient extends JFrame implements ActionListener, ListSelectionL
 				
 				client.new_client_joined();
 				
-				
-				
-			
 
         	} catch (Exception e) {
             	System.out.println("Failed to run the ChatClient");
@@ -153,6 +154,8 @@ private JButton cancel_reply;
 private boolean is_reply = false;
 private ChatMessage message_to_reply;
 
+Icon welcome = new ImageIcon("kissa.jpg");
+
 
 public void initialize_frame(){
 	//frame
@@ -162,6 +165,7 @@ public void initialize_frame(){
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.setSize(800, 600);
 	frame.setResizable(false);
+	frame.setLocationRelativeTo(null);
 	
 	//left menu
 	left_menu = new JPanel();
@@ -340,10 +344,10 @@ public void initialize_frame(){
 
 
 private void new_client_joined(){
-	String newNick = JOptionPane.showInputDialog(frame, "Welcome\nGive a nickname; ", nick);
-	if (newNick != null && !newNick.trim().isEmpty()){
-		nick = newNick;
-	}
+	JOptionPane.showOptionDialog(frame, 
+		"Welcome to use chat\nPlease input your nickname after clicking 'ok'.", "Welcome",
+		JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, welcome, null, null);
+	change_nick();
 	//change_nick();
 	tcpClient.listChannels();
 
@@ -457,7 +461,37 @@ private void send_message(){
 
 
 private void open_help(){
-	JOptionPane.showMessageDialog(null, "Tähän tulee se ohje");
+	//JOptionPane.showMessageDialog(null, "Tähän tulee se ohje");
+	JDialog help_dialog = new JDialog(frame);
+	help_dialog.setSize(300, 400);
+	help_dialog.setLocationRelativeTo(frame);
+	help_dialog.setLayout(new FlowLayout());
+
+	JTextArea text1 = new JTextArea("Help\n - Lähetä viesti painamalla 'send'\n " + 
+		"- Vastaa viestiin painamalla 're'\n" +
+		"- Lähetä yksityisviesti kirjoittamalla vastaanottajan nimimerkki. "+
+		"Huom! Vastaanottajan tulee olla lähettänyt vähintään yhden viestin jtn.\n"+
+		"- Liity kanavalle valitsemalla se vasemmassa reunassa olevasta listasta.\n"+
+		"- Luo uusi kanava painamalla 'new channel' Kanavan aihe ei ole pakollinen. \n"+
+		"- Voit vaihtaa minkä tahansa kanavan aiheen painamalla 'change'.\n"+
+		"- Vaihda nimimerkki painamalla ensin 'Settings' ja sitten 'Change nick'."
+		);
+	text1.setLineWrap(true);
+	text1.setWrapStyleWord(true);
+	text1.setSize(new Dimension(280, 350));
+	help_dialog.add(text1);
+	
+	JButton close = new JButton("close");
+	close.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			help_dialog.dispose();
+		}
+	});
+
+	help_dialog.add(close);
+	help_dialog.setVisible(true);
+
 }
 
 
@@ -465,12 +499,59 @@ private void open_help(){
 
 
 private void new_channel(){
-	String newChannel = JOptionPane.showInputDialog(frame, "New channel name; ");
-	if (newChannel != null && !newChannel.trim().isEmpty()){
-		changeChannel(newChannel);
-		tcpClient.listChannels();
-		change_topic();
-	}
+
+	JDialog new_channel_dialog = new JDialog(frame);
+	new_channel_dialog.setSize(300, 200);
+	new_channel_dialog.setLocationRelativeTo(frame);
+	new_channel_dialog.setLayout(new FlowLayout());
+
+	JLabel text1 = new JLabel("New channel name:    ");
+	new_channel_dialog.add(text1);
+	JTextField newChannel = new JTextField("", 15);
+	//newChannel.setSize(new Dimension(20, 70));
+	new_channel_dialog.add(newChannel);
+	JLabel text2 = new JLabel("New channel topic:    ");
+	new_channel_dialog.add(text2);
+	JTextField newTopic = new JTextField("", 15);
+	//newTopic.setSize(new Dimension(20, 70));
+	new_channel_dialog.add(newTopic);
+
+	JButton ok = new JButton("ok");
+	ok.setSize(new Dimension(20, 20));
+	ok.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (newChannel.getText() == null || newChannel.getText().trim().isEmpty()){
+				newChannel.setBorder(BorderFactory.createLineBorder(Color.red));
+			}else{
+				changeChannel(newChannel.getText());
+				tcpClient.listChannels();
+				if (newTopic.getText() != null && !newTopic.getText().trim().isEmpty()) {
+					tcpClient.changeTopicTo(newTopic.getText());
+				}
+				new_channel_dialog.dispose();
+			}
+		}
+	});
+	JButton cancel = new JButton("cancel");
+	cancel.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new_channel_dialog.dispose();
+		}
+	});
+
+	new_channel_dialog.add(ok);
+	new_channel_dialog.add(cancel);
+
+
+	new_channel_dialog.setVisible(true);
+
+
+
+
+	//String newChannel = JOptionPane.showInputDialog(frame, "New channel name; ");
+	
 }
 
 
@@ -483,8 +564,8 @@ private void change_topic(){
 
 		//tcpClient.postChatMessage("Channel topic changed to " + newChannelTopic);
 		//show_sent_message("Channel topic changed to '" + newChannelTopic  + "'");
-
-		
+	}else{
+		tcpClient.changeTopicTo("no topic");
 	}
 }
 
@@ -493,11 +574,49 @@ private void change_topic(){
 
 
 private void change_nick(){
-	String newNick = JOptionPane.showInputDialog(frame, "New nickname; ", nick);
-	
-	if (newNick != null && !newNick.trim().isEmpty()){
-		nick = newNick;
-	}
+	//String newNick = JOptionPane.showInputDialog(frame, "New nickname; ", nick);
+	//if (newNick != null && !newNick.trim().isEmpty()){
+	//	nick = newNick;
+	//}
+	JDialog new_nick_dialog = new JDialog(frame);
+	new_nick_dialog.setSize(300, 100);
+	new_nick_dialog.setLocationRelativeTo(frame);
+	new_nick_dialog.setLayout(new FlowLayout());
+
+	JLabel text1 = new JLabel("New nickname:    ");
+	new_nick_dialog.add(text1);
+	JTextField newNick = new JTextField(nick, 15);
+	//newChannel.setSize(new Dimension(20, 70));
+	new_nick_dialog.add(newNick);
+
+	JButton ok = new JButton("ok");
+	//ok.setSize(new Dimension(20, 20));
+	ok.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (newNick.getText() == null || newNick.getText().trim().isEmpty()){
+				newNick.setBorder(BorderFactory.createLineBorder(Color.red));
+			}else{
+				nick = newNick.getText();
+				tcpClient.listChannels();
+				new_nick_dialog.dispose();
+			}
+		}
+	});
+	JButton cancel = new JButton("cancel");
+	cancel.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new_nick_dialog.dispose();
+		}
+	});
+
+	new_nick_dialog.add(ok);
+	new_nick_dialog.add(cancel);
+
+
+	new_nick_dialog.setVisible(true);
+
 }
 
 

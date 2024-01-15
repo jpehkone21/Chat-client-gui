@@ -31,7 +31,7 @@
             "mainClass": "oy.tol.chatclient.ChatClient",
             "projectName": "ChatClient",
             "args": [
-                "/Users/Johanna/O4-client-gui/chatclient.properties"
+                "C:/Users/Johanna/O4-client-gui/ohjelmointi4uusi/chatclient.properties"
             ]
         }
     ]
