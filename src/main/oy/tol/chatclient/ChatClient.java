@@ -1,10 +1,7 @@
 
 package oy.tol.chatclient;
 
-
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -28,20 +25,15 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.Utilities;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -57,15 +49,11 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-import com.diogonunes.jcolor.Ansi;
-import com.diogonunes.jcolor.Attribute;
-
 import oy.tol.chat.ChangeTopicMessage;
 import oy.tol.chat.ChatMessage;
 import oy.tol.chat.ErrorMessage;
 import oy.tol.chat.ListChannelsMessage;
 import oy.tol.chat.Message;
-import oy.tol.chat.StatusMessage;
 
 
 public class ChatClient extends JFrame implements ActionListener, ListSelectionListener, ChatClientDataProvider  {
@@ -115,29 +103,24 @@ private JButton new_channel_button;
 private JButton change_topic_button;
 private JButton send_button;
 
-//private JTextArea message_area;
 private JTextPane message_area2;
-//private JPanel new_message_area;
 
 private JTextField message_field;
 private JList<String> channels_list;
 private DefaultListModel<String> model;
 private JScrollPane channel_list_scroll;
 
-private JTextField change_nick_field;
 private JMenuBar menubar;
 private JMenu settingsMenu;
 private JButton helpMenu;
 private JMenuItem change_nick;
 
-private JButton private_message;
 
 private JPanel private_message_pane;
 private JTextArea private_text;
 private JTextField private_field;
 
 private JPanel header_pane;
-private JScrollPane header_scroll;
 private JLabel header_text1;
 private JLabel header_text2;
 
@@ -175,13 +158,10 @@ public void initialize_frame(){
 	frame.add(left_menu, BorderLayout.WEST);
 
 	//left menu buttons
-	//Icon update = new ImageIcon("update.PNG");
 	update_channels_button = new JButton("update channels");
 	new_channel_button = new JButton("new channel");
-	
 	update_channels_button.addActionListener(this);
 	new_channel_button.addActionListener(this);
-
 	update_channels_button.setPreferredSize(new Dimension(140, 20));
 	new_channel_button.setPreferredSize(new Dimension(140, 20));
 
@@ -214,7 +194,6 @@ public void initialize_frame(){
 	//scroll pane for messages
 	message_list_panel = new JScrollPane(message_area2);
 	message_list_panel.setBackground(Color.BLUE);
-	//message_list_panel.setPreferredSize(new Dimension(100, 400));
 	message_list_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	middle_pane.add(message_list_panel, BorderLayout.CENTER);
 
@@ -238,7 +217,6 @@ public void initialize_frame(){
 	private_message_pane.add(private_field, BorderLayout.CENTER);
 
 	cancel_reply = new JButton("cancel");
-	//cancel_reply.setPreferredSize(new Dimension(50, 20));
 	cancel_reply.addActionListener(this);
 	private_message_pane.add(cancel_reply, BorderLayout.EAST);
 	cancel_reply.setVisible(false);
@@ -252,7 +230,7 @@ public void initialize_frame(){
 	send_button.addActionListener(this);
 	message_panel.add(send_button);
 
-	//list and panel and scroll to display channels
+	//list, panel and scroll to display channels
 	model = new DefaultListModel<String>();
 	channels_list = new JList<String>(model);
 	channels_list.addListSelectionListener(this);
@@ -263,50 +241,14 @@ public void initialize_frame(){
 	channel_list_scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	channel_list_scroll.setPreferredSize(new Dimension(140, 300));
 	left_menu.add(channel_list_scroll);
-	
-	//left menu text stuff, could be modified!!!!!??????
-	JPanel update_channels_pane = new JPanel();
-	JLabel update_channels_label = new JLabel("update channels:");
-	//update_channels_pane.add(update_channels_label);
-	//update_channels_pane.add(update_channels_button);
-	//left_menu.add(update_channels_pane);
-	
-	JPanel new_channel_pane = new JPanel();
-	JLabel new_channel_label = new JLabel ("new channel: ");
-	//new_channel_pane.add(new_channel_label);
-	//new_channel_pane.add(new_channel_button);
-	//left_menu.add(new_channel_pane);
-	left_menu.add(update_channels_button);
-	left_menu.add(new_channel_button);
 
-	//JPanel change_topic_pane = new JPanel();
-	//JLabel change_topic_label = new JLabel ("Change topic: ");
-	//change_topic_pane.add(change_topic_label);
-	//change_topic_pane.add(change_topic_button);
-	//left_menu.add(change_topic_pane);
-
-	//reply = new JButton("reply");
-	//reply.addActionListener(this);
-	//left_menu.add(reply);
-	//left_menu.add(private_message);
-	//left_menu.add(new_channel_button);
-	//left_menu.add(change_topic_button);
-
-	//up header panel and stuff related to that
+	//up header panel to display current channel and topic
 	header_pane = new JPanel();
 	header_pane.setBackground(Color.LIGHT_GRAY);
-	//header_pane.setPreferredSize(new Dimension(100, 40));
 	header_pane.setLayout(new FlowLayout(FlowLayout.LEFT));
-	//header_pane.setLayout(new GridLayout(1, 5));
-	header_scroll = new JScrollPane();
-	//header_scroll.add(header_pane);
-
 
 	header_text1 = new JLabel("  Current channel: ");
-	//header_text1.setForeground(Color.black);
 	header_text2 = new JLabel("    Topic: ");
-	//header_text2.setForeground(Color.black);
-
 	Font font = new Font("Courier", Font.BOLD,12);
 
 	header_text_topic = new JLabel("topic unknown");
@@ -314,7 +256,7 @@ public void initialize_frame(){
 	header_text_topic.setOpaque(true);
 	header_text_topic.setFont(font);
 	
-	header_text_channel = new JLabel("main");
+	header_text_channel = new JLabel(currentChannel);
 	header_text_channel.setBackground(Color.white);
 	header_text_channel.setOpaque(true);
 	header_text_channel.setFont(font);
@@ -327,32 +269,16 @@ public void initialize_frame(){
 	change_topic_button = new JButton("change");
 	change_topic_button.addActionListener(this);
 	header_pane.add(change_topic_button);
-	
 
 	middle_pane.add(header_pane, BorderLayout.NORTH);
 
-	//reply.addActionListener(this);
-	//reply_private.addActionListener(this);
+	left_menu.add(update_channels_button);
+	left_menu.add(new_channel_button);
 
+	//enter can be used to send messages
 	frame.getRootPane().setDefaultButton(send_button);
 
 	frame.setVisible(true);
-}
-
-
-
-
-
-private void new_client_joined(){
-	JOptionPane.showOptionDialog(frame, 
-		"Welcome to use chat\nPlease input your nickname after clicking 'ok'.", "Welcome",
-		JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, welcome, null, null);
-	change_nick();
-	//change_nick();
-	tcpClient.listChannels();
-
-	//message_area.append("Welcome " + nick + "! Current channel is " + currentChannel + ". \n");
-	//message_area.append() topic
 }
 
 
@@ -383,33 +309,21 @@ public void actionPerformed(ActionEvent e) {
 	if(e.getSource() == helpMenu){
 		open_help();
 	}
-	/* 
-	if(e.getSource() == reply){
-		//perus vastaus
-		String replying_to = retrieveTextFromSameLine();
 
-		System.out.println("normi reply");
-		int selectionStart = message_area2.getSelectionStart();
-        int selectionEnd = message_area2.getSelectionEnd();
-		if (selectionStart != selectionEnd) {
-			StyledDocument doc = message_area2.getStyledDocument();////tässä menossa?
-            try {
-                String selectedText = doc.getText(selectionStart, selectionEnd - selectionStart);
-				System.out.println(selectedText);
-
-			} catch (BadLocationException ex) {
-                ex.printStackTrace();
-            }
-		}
-	}
-	if(e.getSource() == reply_private){
-		//vastaus priva messageen
-		System.out.println("priva reply");
-	}*/
 	if(e.getSource() == cancel_reply){
 		reset_private_fields();
 	}
 }
+
+
+private void new_client_joined(){
+	JOptionPane.showOptionDialog(frame, 
+		"Welcome to use chat\nPlease input your nickname after clicking 'ok'.", "Welcome",
+		JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, welcome, null, null);
+	change_nick();
+	tcpClient.listChannels();
+}
+
 
 
 
@@ -428,14 +342,11 @@ private void send_message(){
 	if(message != null && !message.trim().isEmpty()){
 		String to_user = private_field.getText();
 		if(is_reply){
-
-
-			message = "reply to:  " + message_to_reply.getNick() +"  ---   "+ message_to_reply.getMessage() + "\n ---  " + message;
+			message = "reply to:  " + message_to_reply.getNick() +" --- "+ message_to_reply.getMessage() + "\n-->  " + message;
 			if (message_to_reply.isDirectMessage()){
 				to_user = message_to_reply.directMessageRecipient();
 			}
 		}
-
 		
 		if(to_user!= null && !to_user.trim().isEmpty()){
 			StringBuilder str = new StringBuilder();
@@ -448,7 +359,6 @@ private void send_message(){
 			private_field.setText("");
 
 		}
-		
 
 		tcpClient.postChatMessage(message);
 		show_sent_message(message);
@@ -459,9 +369,7 @@ private void send_message(){
 
 
 
-
 private void open_help(){
-	//JOptionPane.showMessageDialog(null, "Tähän tulee se ohje");
 	JDialog help_dialog = new JDialog(frame);
 	help_dialog.setSize(300, 400);
 	help_dialog.setLocationRelativeTo(frame);
@@ -491,10 +399,7 @@ private void open_help(){
 
 	help_dialog.add(close);
 	help_dialog.setVisible(true);
-
 }
-
-
 
 
 
@@ -508,12 +413,12 @@ private void new_channel(){
 	JLabel text1 = new JLabel("New channel name:    ");
 	new_channel_dialog.add(text1);
 	JTextField newChannel = new JTextField("", 15);
-	//newChannel.setSize(new Dimension(20, 70));
+
 	new_channel_dialog.add(newChannel);
 	JLabel text2 = new JLabel("New channel topic:    ");
 	new_channel_dialog.add(text2);
 	JTextField newTopic = new JTextField("", 15);
-	//newTopic.setSize(new Dimension(20, 70));
+
 	new_channel_dialog.add(newTopic);
 
 	JButton ok = new JButton("ok");
@@ -544,14 +449,7 @@ private void new_channel(){
 	new_channel_dialog.add(ok);
 	new_channel_dialog.add(cancel);
 
-
 	new_channel_dialog.setVisible(true);
-
-
-
-
-	//String newChannel = JOptionPane.showInputDialog(frame, "New channel name; ");
-	
 }
 
 
@@ -561,10 +459,7 @@ private void change_topic(){
 	String newChannelTopic = JOptionPane.showInputDialog(frame, "New channel topic; ");
 	if (newChannelTopic != null && !newChannelTopic.trim().isEmpty()) {
 		tcpClient.changeTopicTo(newChannelTopic);
-
-		//tcpClient.postChatMessage("Channel topic changed to " + newChannelTopic);
-		//show_sent_message("Channel topic changed to '" + newChannelTopic  + "'");
-	}else{
+	} else {
 		tcpClient.changeTopicTo("no topic");
 	}
 }
@@ -572,12 +467,8 @@ private void change_topic(){
 
 
 
-
 private void change_nick(){
-	//String newNick = JOptionPane.showInputDialog(frame, "New nickname; ", nick);
-	//if (newNick != null && !newNick.trim().isEmpty()){
-	//	nick = newNick;
-	//}
+
 	JDialog new_nick_dialog = new JDialog(frame);
 	new_nick_dialog.setSize(300, 100);
 	new_nick_dialog.setLocationRelativeTo(frame);
@@ -586,11 +477,9 @@ private void change_nick(){
 	JLabel text1 = new JLabel("New nickname:    ");
 	new_nick_dialog.add(text1);
 	JTextField newNick = new JTextField(nick, 15);
-	//newChannel.setSize(new Dimension(20, 70));
 	new_nick_dialog.add(newNick);
 
 	JButton ok = new JButton("ok");
-	//ok.setSize(new Dimension(20, 20));
 	ok.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -614,9 +503,7 @@ private void change_nick(){
 	new_nick_dialog.add(ok);
 	new_nick_dialog.add(cancel);
 
-
 	new_nick_dialog.setVisible(true);
-
 }
 
 
@@ -629,15 +516,6 @@ private void show_sent_message(String message){
 	StyledDocument doc = message_area2.getStyledDocument();
 	LocalDateTime now = LocalDateTime.now();
 	String now_str = timeFormatter.format(now);
-	//message_area.append(now_str + "  " + nick + "(you)   ---    " + message + "\n");
-	//JPanel new_message = new JPanel();
-	//new_message.setLayout(new FlowLayout(FlowLayout.LEFT));
-	//new_message.setPreferredSize(new Dimension(500, 20));
-	//new_message.setBackground(Color.YELLOW);
-	//JLabel text = new JLabel(now_str + "  " + nick + "(you)   ---    " + message + "\n");
-	//text.setPreferredSize(new Dimension(1000, 20));
-	//new_message.add(text);
-	//new_message_area.add(new_message);
 
 	Style style = message_area2.addStyle("SenderStyle", null);
     StyleConstants.setForeground(style, Color.BLUE);
@@ -645,7 +523,6 @@ private void show_sent_message(String message){
 
 	reply = new JButton("re");
 	reply.setPreferredSize(new Dimension(20, 20));
-	//reply.addActionListener(this);
 	reply.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -655,17 +532,14 @@ private void show_sent_message(String message){
 
 	try {
 		doc.insertString(doc.getLength(), now_str + "  " + nick + " (you)   ---    " + message + "     ", style);
-		//message_area2.insertComponent(new JButton("re"));
 		StyleConstants.setComponent(style, reply);
 		doc.insertString(doc.getLength(), "\n", style );
 	} catch (BadLocationException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 
 	frame.setVisible(true);
 }
-
 
 
 
@@ -703,9 +577,6 @@ private void readConfiguration(String configFileName) throws FileNotFoundExcepti
 		System.out.println("Invalid server address in settings");
 	}
 	nick = config.getProperty("nick", "");
-	if (config.getProperty("usecolor", "false").equalsIgnoreCase("true")) {
-		//useColorOutput = true;
-	}
 	istream.close();
 }
 
@@ -742,13 +613,9 @@ private static final DateTimeFormatter timeFormatter = new DateTimeFormatterBuil
 
 
 
-
-
 @Override
 public boolean handleReceived(Message message) {
-	Style style = message_area2.addStyle("ReceivedStyle", null);
-   	StyleConstants.setForeground(style, Color.BLACK);
-    //StyleConstants.setBold(style, true);
+	
 	StyledDocument doc = message_area2.getStyledDocument();
 
 	boolean continueReceiving = true;
@@ -756,7 +623,14 @@ public boolean handleReceived(Message message) {
 			case Message.CHAT_MESSAGE: {
 				if (message instanceof ChatMessage) {
 					ChatMessage msg = (ChatMessage)message;
+
 					if (msg.isDirectMessage()) {
+						//private message
+
+						Style style = message_area2.addStyle("PrivateStyle", null);
+   						StyleConstants.setForeground(style, Color.ORANGE);
+    					StyleConstants.setBold(style, true);
+
 						String message_got = msg.getMessage();
 						String sender_nick = msg.getNick();
 						String sent_time = timeFormatter.format(msg.getSent());
@@ -767,24 +641,25 @@ public boolean handleReceived(Message message) {
 								replyToMessage(msg);
 							}
 						});
-						//privaatti message saatu
-						
-						//UUID msg.isReplyTo();
+
 
 						try {
-							doc.insertString(doc.getLength(), sent_time + "  " + sender_nick + " (yksityisviesti)   ---    " + message_got + "     ", style);
+							doc.insertString(doc.getLength(), sent_time + "  " + sender_nick + " (yksityisviesti) --- " + message_got + "     ", style);
 							StyleConstants.setComponent(style, reply_private);
 							doc.insertString(doc.getLength(), "\n", style );
 						} catch (BadLocationException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
 						frame.setVisible(true);
-						//message_area.append(sent_time + "  private message from:  " + sender_nick + "   ------   " + message_got + "\n");
 
 					} else {
-						//normi message saatu
+						//normal message
+
+						Style style = message_area2.addStyle("ReceivedStyle", null);
+   						StyleConstants.setForeground(style, Color.BLACK);
+    					StyleConstants.setBold(style, true);
+
 						String message_got = msg.getMessage();
 						String sender_nick = msg.getNick();
 						String sent_time = timeFormatter.format(msg.getSent());
@@ -795,19 +670,12 @@ public boolean handleReceived(Message message) {
 								replyToMessage(msg);
 							}
 						});
-						
-
-						
-						//message_area.append(sent_time + "  " + sender_nick + "   ------   " + message_got + "\n");
 
 						try {
-							doc.insertString(doc.getLength(), sent_time + "  " + sender_nick + "    ---    " + message_got + "    ", style);
-							//message_area2.insertComponent(new JButton("reply"));
+							doc.insertString(doc.getLength(), sent_time + "  " + sender_nick + " --- " + message_got + "    ", style);
 							StyleConstants.setComponent(style, reply);
 							doc.insertString(doc.getLength(), "\n", style );
-						
 						} catch (BadLocationException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
@@ -821,46 +689,38 @@ public boolean handleReceived(Message message) {
 				ListChannelsMessage msg = (ListChannelsMessage)message;
 				List<String> channels = msg.getChannels();
 				if (null != channels) {
-					System.out.println(channels);
 					update_channels(channels);
-					
 				}
 				break;
 			}
 
 			case Message.CHANGE_TOPIC: {
 				ChangeTopicMessage msg = (ChangeTopicMessage)message;
-				//vaihda aihe
-				//message_area.append("aihe vaihdettu: " + msg.getTopic() + "\n");
 				header_text_topic.setText(msg.getTopic());
 
 				break;
 			}
 
 			case Message.STATUS_MESSAGE: {
-				StatusMessage msg = (StatusMessage)message;
-				//message_area.append("status: " + msg.getStatus() + "\n");
-				//näytä status
+				//StatusMessage msg = (StatusMessage)message;
 				break;
 			}
 
 			case Message.ERROR_MESSAGE: {
+				Style style = message_area2.addStyle("ErrorStyle", null);
+   				StyleConstants.setForeground(style, Color.RED);
+   				StyleConstants.setBold(style, true);
 				ErrorMessage msg = (ErrorMessage)message;
-				//message_area.append("error: " + msg.getError() + "\n");
 				try {
 					doc.insertString(doc.getLength(), "Error: " + msg.getError() + "\n", style);
 				} catch (BadLocationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 				frame.setVisible(true);
-				//error
-				System.out.println("joku error");
 				if (msg.requiresClientShutdown()) {
 					continueReceiving = false;
 					running = false;
-					System.out.println("Vissiin tapahtu jotain pahaa");
 					JOptionPane.showMessageDialog(frame, "connection closed\nClose the window by clicking 'ok'");
 					System.exit(0);
 				}
@@ -869,68 +729,31 @@ public boolean handleReceived(Message message) {
 
 			default:
 				try {
-						doc.insertString(doc.getLength(), "Unknown message type from server\n", style);
+					Style style = message_area2.addStyle("ReceivedStyle", null);
+   					StyleConstants.setForeground(style, Color.GRAY);
+    				StyleConstants.setBold(style, true);
+					doc.insertString(doc.getLength(), "Unknown message type from server\n", style);
 				} catch (BadLocationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("Unknown message type from server.");
 				break;
 		}
-		//printPrompt(LocalDateTime.now(), nick, "", colorMsg);
+
 		return continueReceiving;
 }
 
 
 private void replyToMessage(ChatMessage message) {
 	is_reply = true;
-	//String originalMessage = message.getMessage();
 	message_to_reply = message;
 	if(message.isDirectMessage()){
 		message_to_reply.setRecipient(message.getNick());
 	}
-
-	//System.out.println(originalMessage);
  
 	private_text.setText("  reply to:   " + message.getNick() + "  --  " + message.getMessage());
 	private_field.setVisible(false);
 	cancel_reply.setVisible(true);
-	
-
-
-	//String replyContent = JOptionPane.showInputDialog("Reply to: " + originalMessage);
-	//String sender = "User";
-	//Message replyMessage = new Message(sender, replyContent);
-
-	//messages.add(replyMessage);
-
-	// Update chat panel
-	//addMessageToChatPanel(sender + ": Reply to " + originalMessage + ": " + replyContent);
-	//updateReplyToComboBox();
 }
-
-/* 
-private String retrieveTextFromSameLine() {
-        int caretPosition = message_area2.getCaretPosition();
-
-        try {
-            // Find the start and end offsets of the current line
-            int startOffset = Utilities.getRowStart(message_area2, caretPosition);
-            int endOffset = Utilities.getRowEnd(message_area2, caretPosition);
-
-            // Extract the text from the current line
-            String lineText = message_area2.getText(startOffset, endOffset - startOffset);
-			return lineText;
-            // Process the extracted text (in this example, simply display it)
-            //JOptionPane.showMessageDialog(this, "Text on the same line: \n" + lineText);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-		return "ei onnistunu";
-    }
-*/
-
-
 
 
 
@@ -942,17 +765,16 @@ private void update_channels(List<String> channels){
 	List<String> temp = new ArrayList<>();
 	
 	for (int i = 0; i<channels.size(); i++){
+		//checking if new channels have been created
 
 		String[] splitted = channels.get(i).split(" ");
 		String channelName = splitted[0];
 		temp.add(channelName);
 
 		if(!model.contains(channelName)){
-			//message_area.append("New channel " + channelName + " added.\n");
 			try {
 				doc.insertString(doc.getLength(), "New channel " + channelName + " added.\n" , style);
 			} catch (BadLocationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -963,18 +785,16 @@ private void update_channels(List<String> channels){
 	 
 	if(model.size() > temp.size()){
 		for (int i = 0; i<model.size();i++){
+			//checking if channels need to be deleted from the list
+
 			if(!temp.contains(model.get(i))){
-				//message_area.append("Channel " + model.get(i) + " has 0 users so it is deleted. \n");
 				
 				try {
 					doc.insertString(doc.getLength(),  "Channel " + model.get(i) + " has 0 users so it is deleted. \n", style);
 				} catch (BadLocationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				frame.setVisible(true);
-				
 				
 				model.remove(i);
 			}
@@ -999,17 +819,13 @@ public void connectionClosed() {
 
 @Override
 public void valueChanged(ListSelectionEvent e) {
-	if (!e.getValueIsAdjusting()) {//This line prevents double events
-		//channel listasta valittu jotain
-		System.out.println("listasta " + channels_list.getSelectedValuesList());
+	if (!e.getValueIsAdjusting()) {
 		if (channels_list.getSelectedValue() != null){
 			changeChannel(channels_list.getSelectedValue());
 			channels_list.clearSelection();
 		}
 	}
 }
-
-
 
 
 
@@ -1022,16 +838,14 @@ private void changeChannel(String selected) {
 	String newChannel = splitted[0];
 	tcpClient.changeChannelTo(newChannel);	
 	currentChannel = newChannel;
-	//message_area.append("You changed channel to " + newChannel + "\n");
+
 	try {
 		doc.insertString(doc.getLength(), "You changed channel to " + newChannel + "\n", style);
 	} catch (BadLocationException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 
 	frame.setVisible(true);
-
 
 	header_text_channel.setText(newChannel);
 }
