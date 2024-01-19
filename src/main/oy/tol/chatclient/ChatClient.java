@@ -59,7 +59,6 @@ import oy.tol.chat.Message;
 public class ChatClient extends JFrame implements ActionListener, ListSelectionListener, ChatClientDataProvider  {
 
     public static void main(String[] args) {
-		System.out.println(args.length);
  
     	if (args.length == 1) {								
         	try {
@@ -137,7 +136,10 @@ private JButton cancel_reply;
 private boolean is_reply = false;
 private ChatMessage message_to_reply;
 
-Icon welcome = new ImageIcon("kissa.jpg");
+//Icons are from https://icons8.com/icons
+Icon reply_icon = new ImageIcon("icons8-reply-50.png");
+Icon send_icon = new ImageIcon("icons8-send-48.png");
+Icon welcome = new ImageIcon("icons8-smiley-48.png");
 
 
 public void initialize_frame(){
@@ -211,7 +213,7 @@ public void initialize_frame(){
 	private_message_pane.setLayout(new BorderLayout());
 	message_panel.add(private_message_pane);
 
-	private_text = new JTextArea("  Yksityisviesti käyttäjälle:   ");
+	private_text = new JTextArea("  Private message to user:   ");
 	private_field = new JTextField();
 	private_message_pane.add(private_text, BorderLayout.WEST);
 	private_message_pane.add(private_field, BorderLayout.CENTER);
@@ -221,12 +223,14 @@ public void initialize_frame(){
 	private_message_pane.add(cancel_reply, BorderLayout.EAST);
 	cancel_reply.setVisible(false);
 
+	//space where you write the message
 	message_field = new JTextField();
-	message_field.setPreferredSize(new Dimension(630, 60));
+	message_field.setPreferredSize(new Dimension(628, 60));
 	message_panel.add(message_field);
 
 	//send button
-	send_button = new JButton("send");
+	send_button = new JButton(send_icon);
+	send_button.setBackground(Color.WHITE);
 	send_button.addActionListener(this);
 	message_panel.add(send_button);
 
@@ -318,7 +322,8 @@ public void actionPerformed(ActionEvent e) {
 
 private void new_client_joined(){
 	JOptionPane.showOptionDialog(frame, 
-		"Welcome to use chat\nPlease input your nickname after clicking 'ok'.", "Welcome",
+		"Welcome to chat\n Please input your nickname after clicking 'ok'.\n"+
+		"If this is your first time, please read instructions by clicking 'Help'.", "Welcome",
 		JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, welcome, null, null);
 	change_nick();
 	tcpClient.listChannels();
@@ -328,7 +333,7 @@ private void new_client_joined(){
 
 
 private void reset_private_fields(){
-	private_text.setText("Yksityisviesti käyttäjälle: ");
+	private_text.setText("  Private message to user:   ");
 	private_field.setVisible(true);
 	cancel_reply.setVisible(false);
 	is_reply = false;
@@ -342,7 +347,7 @@ private void send_message(){
 	if(message != null && !message.trim().isEmpty()){
 		String to_user = private_field.getText();
 		if(is_reply){
-			message = "reply to:  " + message_to_reply.getNick() +" --- "+ message_to_reply.getMessage() + "\n-->  " + message;
+			message = "Reply to:  " + message_to_reply.getNick() +" --- "+ message_to_reply.getMessage() + "\n-->  " + message;
 			if (message_to_reply.isDirectMessage()){
 				to_user = message_to_reply.directMessageRecipient();
 			}
@@ -375,21 +380,23 @@ private void open_help(){
 	help_dialog.setLocationRelativeTo(frame);
 	help_dialog.setLayout(new FlowLayout());
 
-	JTextArea text1 = new JTextArea("Help\n - Lähetä viesti painamalla 'send'\n " + 
-		"- Vastaa viestiin painamalla 're'\n" +
-		"- Lähetä yksityisviesti kirjoittamalla vastaanottajan nimimerkki. "+
-		"Huom! Vastaanottajan tulee olla lähettänyt vähintään yhden viestin jtn.\n"+
-		"- Liity kanavalle valitsemalla se vasemmassa reunassa olevasta listasta.\n"+
-		"- Luo uusi kanava painamalla 'new channel' Kanavan aihe ei ole pakollinen. \n"+
-		"- Voit vaihtaa minkä tahansa kanavan aiheen painamalla 'change'.\n"+
-		"- Vaihda nimimerkki painamalla ensin 'Settings' ja sitten 'Change nick'."
+	JTextArea text1 = new JTextArea(" Instructions:  \n  - Send a message by clicking 'send'.\n" + 
+		" - Reply to a message by clicking 're' next to the message.\n" +
+		" - Send a private message by typing the recipient's nickname to the field after 'Private message to: '. "+
+		" Note! The recipient must have sent at least one message before being able to receive a private message." + 
+		" This applies also when a user changes their nickname.\n"+
+		" - Join a channel by clikcing it's name from the list on the left side of the screen.\n"+
+		" - Create a new channel by clicking 'new channel'. Only name of the channel is required. Topic field is optional and can be changed later. \n"+
+		" - Change the topic of any channel by clicking 'change' next to the current topic.\n"+
+		" - Change your nickname by clicking 'Change nick' from the settings. New nickanme can't be empty.\n"+
+		" Remember to respect other users and have fun! :)"
 		);
 	text1.setLineWrap(true);
 	text1.setWrapStyleWord(true);
 	text1.setSize(new Dimension(280, 350));
 	help_dialog.add(text1);
 	
-	JButton close = new JButton("close");
+	JButton close = new JButton("Close");
 	close.addActionListener(new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -521,7 +528,8 @@ private void show_sent_message(String message){
     StyleConstants.setForeground(style, Color.BLUE);
     StyleConstants.setBold(style, true);
 
-	reply = new JButton("re");
+	reply = new JButton(reply_icon);
+	reply.setBackground(Color.WHITE);
 	reply.setPreferredSize(new Dimension(20, 20));
 	reply.addActionListener(new ActionListener() {
 		@Override
@@ -634,7 +642,8 @@ public boolean handleReceived(Message message) {
 						String message_got = msg.getMessage();
 						String sender_nick = msg.getNick();
 						String sent_time = timeFormatter.format(msg.getSent());
-						reply_private = new JButton("re");
+						reply_private = new JButton(reply_icon);
+						reply_private.setBackground(Color.WHITE);
 						reply_private.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
@@ -663,7 +672,8 @@ public boolean handleReceived(Message message) {
 						String message_got = msg.getMessage();
 						String sender_nick = msg.getNick();
 						String sent_time = timeFormatter.format(msg.getSent());
-						reply = new JButton("re");
+						reply = new JButton(reply_icon);
+						reply.setBackground(Color.WHITE);
 						reply.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {

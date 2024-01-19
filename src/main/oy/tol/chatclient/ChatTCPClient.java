@@ -11,9 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.List;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,7 +61,6 @@ public class ChatTCPClient implements Runnable {
 	}
 
 	private synchronized void write(String message) {
-		// ChatClient.println("DEBUG OUT: " + message, ChatClient.colorError);
 		out.write(message + "\n");
 		out.flush();
 	}
@@ -77,16 +74,13 @@ public class ChatTCPClient implements Runnable {
 				}
 				String data;
 				while ((data = in.readLine()) != null) {
-					// ChatClient.println("DEBUG IN: " + data, ChatClient.colorInfo);
 					boolean continueReading = handleMessage(data);
 					if (!continueReading) {
 						break;
 					}
 				}
 			} catch (EOFException e) {
-				// ChatClient.println("ChatSession: EOFException", ChatClient.colorError);
 			} catch (IOException e) {
-				// ChatClient.println("ChatSession: IOException", ChatClient.colorError);
 				ErrorMessage msg = new ErrorMessage("Cannot connect: " + e.getLocalizedMessage(), true);
 				dataProvider.handleReceived(msg);
 			} catch (Exception e) {
@@ -104,7 +98,6 @@ public class ChatTCPClient implements Runnable {
 		socket = new Socket(hostAddress, port);
 		out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-		// ChatClient.println("Connecting to server " + address, ChatClient.colorError);
 	}
 
 	private boolean handleMessage(String data) {
@@ -153,8 +146,6 @@ public class ChatTCPClient implements Runnable {
 		ListChannelsMessage listChannels = new ListChannelsMessage();
 		String msg = listChannels.toJSON();
 		write(msg);
-		//return msg;
-		//return listChannels.getChannels();
 
 	}
 }
